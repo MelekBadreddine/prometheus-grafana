@@ -1,4 +1,4 @@
-DeployFlask Microservice to Minikube with Prometheus and Grafana Monitoring
+Deploy Flask Microservice to Minikube with Prometheus and Grafana Monitoring
 
 This project demonstrates a Flask microservice application that is deployed on Minikube and monitored using Prometheus and Grafana.
 
