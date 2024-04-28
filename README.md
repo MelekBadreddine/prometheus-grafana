@@ -46,7 +46,7 @@ Getting Started
    * Create custom dashboards or use pre-built dashboards to monitor your Flask application.
    * Configure alerts and notifications in Prometheus and Grafana.
 
-  ![Alt Text](https://github.com/MelekBadreddine/prometheus-grafana/assets/grafana.jpg)
+  ![Alt Text](https://github.com/MelekBadreddine/prometheus-grafana/assets/grafana.png)
 
 
 
