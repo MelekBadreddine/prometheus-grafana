@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+
+    environment {
+        MINIKUBE_IP = sh(script: 'minikube ip', returnStdout: true).trim()
+        MONITORING_RELEASE_NAME = 'prometheus'
+        DOCKER_IMAGE = 'melekbadreddine/flask-app'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}", '--pull .')
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('', 'docker-registry-credentials') {
+                        docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Minikube') {
+            steps {
+                kubernetesDeploy(
+                    configs: 'kubernetes/deployment.yaml',
+                    kubeconfigId: 'minikube',
+                    containers: [
+                        [
+                            name: 'flask-app',
+                            image: "${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
+                        ]
+                    ]
+                )
+            }
+        }
+
+        stage('Update Monitoring Stack') {
+            steps {
+                script {
+                    helmUpgrade(
+                        releaseName: "${MONITORING_RELEASE_NAME}",
+                        chart: 'prometheus-community/kube-prometheus-stack',
+                        values: [
+                            "grafana.enabled: true",
+                            "grafana.adminPassword: B62M3tXEbaG7Cf5YCFF32IGpWqAtriF4Tq08Gyku"
+                        ]
+                    )
+                }
+            }
+        }
+    }
+}
